@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Eclipse Lab — Interactive Solar & Lunar Eclipse Simulator</title>
+  <meta
+    name="description"
+    content="Explore Solar and Lunar Eclipses with an interactive 3D geometry simulator, live Earth-sky observer view, shadow anatomy, phase timeline, and science quiz."
+  />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Kannada:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="space-bg" aria-hidden="true"></div>
+
+  <!-- Top Navigation -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a href="#simulator" class="brand">
+        <span class="brand-icon" aria-hidden="true">
+          <svg viewBox="0 0 36 36" width="32" height="32">
+            <defs>
+              <radialGradient id="brandGlow" cx="50%" cy="50%" r="50%">
+                <stop offset="55%" stop-color="#fbbf24" stop-opacity="0.95" />
+                <stop offset="85%" stop-color="#f59e0b" stop-opacity="0.35" />
+                <stop offset="100%" stop-color="#f59e0b" stop-opacity="0" />
+              </radialGradient>
+            </defs>
+            <circle cx="18" cy="18" r="16" fill="url(#brandGlow)" />
+            <circle cx="18" cy="18" r="10.5" fill="#fbbf24" />
+            <circle cx="19.5" cy="17.2" r="9.4" fill="#070b14" />
+          </svg>
+        </span>
+        <span class="brand-text">
+          <span class="brand-title" data-i18n="brandTitle">Eclipse Lab</span>
+          <span class="brand-subtitle" data-i18n="brandSub">Interactive Astronomy Observatory</span>
+        </span>
+      </a>
+
+      <nav class="nav-links" aria-label="Primary navigation">
+        <a href="#simulator" data-i18n="navSim">Simulator</a>
+        <a href="#phases" data-i18n="navPhases">Phases</a>
+        <a href="#guide" data-i18n="navGuide">Shadow Guide</a>
+        <a href="#quiz" data-i18n="navQuiz">Quiz</a>
+      </nav>
+
+      <div class="nav-actions">
+        <div class="lang-toggle" role="group" aria-label="Language switcher">
+          <button type="button" class="lang-btn active" data-lang="en">EN</button>
+          <button type="button" class="lang-btn" data-lang="kn">ಕನ್ನಡ</button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="container main-content">
+    <!-- Hero Intro Strip -->
+    <section class="hero-strip">
+      <div class="hero-copy">
+        <span class="eyebrow" data-i18n="heroEyebrow">Interactive Science Project • Orbital Geometry</span>
+        <h1 data-i18n="heroTitle">Explore Solar &amp; Lunar Eclipses in Real Time</h1>
+        <p data-i18n="heroDesc">
+          Experiment with the Sun–Earth–Moon alignment, Moon distance (Perigee to Apogee), and 5.14° orbital tilt
+          to see how Umbra, Penumbra, and Antumbra shadows create Total, Annular, and Blood Moon eclipses.
+        </p>
+      </div>
+      <div class="hero-pills" aria-label="Quick eclipse type switch">
+        <button type="button" class="category-pill active" data-category="solar">
+          <span class="dot dot-solar" aria-hidden="true"></span>
+          <span data-i18n="catSolar">Solar Eclipse</span>
+        </button>
+        <button type="button" class="category-pill" data-category="lunar">
+          <span class="dot dot-lunar" aria-hidden="true"></span>
+          <span data-i18n="catLunar">Lunar Eclipse</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Section 1: Interactive Simulator -->
+    <section id="simulator" class="simulator-section" aria-label="Eclipse Simulator">
+      <!-- Preset Bar -->
+      <div class="preset-bar" role="group" aria-label="Eclipse presets">
+        <button type="button" class="preset-btn active" data-preset="solar-total" data-i18n="presetSolarTotal">
+          Total Solar
+        </button>
+        <button type="button" class="preset-btn" data-preset="solar-annular" data-i18n="presetSolarAnnular">
+          Annular (Ring of Fire)
+        </button>
+        <button type="button" class="preset-btn" data-preset="solar-partial" data-i18n="presetSolarPartial">
+          Partial Solar
+        </button>
+        <button type="button" class="preset-btn" data-preset="lunar-total" data-i18n="presetLunarTotal">
+          Total Lunar (Blood Moon)
+        </button>
+        <button type="button" class="preset-btn" data-preset="lunar-partial" data-i18n="presetLunarPartial">
+          Partial Lunar
+        </button>
+        <button type="button" class="preset-btn" data-preset="lunar-penumbral" data-i18n="presetLunarPenumbral">
+          Penumbral Lunar
+        </button>
+      </div>
+
+      <div class="simulator-grid">
+        <!-- Left Stage: Orbital & Shadow Geometry Canvas + Playback -->
+        <div class="stage-column">
+          <div class="glass-card canvas-card">
+            <div class="card-header">
+              <div class="header-left">
+                <h2 data-i18n="spaceViewTitle">Orbital Geometry &amp; Shadow Cones</h2>
+                <span class="scale-note" data-i18n="scaleNote">Schematic view (sizes &amp; distances not to scale)</span>
+              </div>
+              <div class="canvas-toggles">
+                <label class="chip-toggle">
+                  <input type="checkbox" id="toggleLabels" checked />
+                  <span data-i18n="toggleLabels">Labels</span>
+                </label>
+                <label class="chip-toggle">
+                  <input type="checkbox" id="toggleRays" checked />
+                  <span data-i18n="toggleRays">Light Rays</span>
+                </label>
+                <label class="chip-toggle">
+                  <input type="checkbox" id="toggleOrbit" checked />
+                  <span data-i18n="toggleOrbit">Orbit</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="canvas-wrapper space-wrapper">
+              <canvas id="spaceCanvas" aria-label="Interactive orbital geometry simulation canvas"></canvas>
+              <div class="canvas-hud-top">
+                <span id="statusBadge" class="status-badge">Total Solar Eclipse</span>
+                <span id="dragHint" class="drag-hint" data-i18n="dragHint">Drag across canvas or scrub timeline</span>
+              </div>
+            </div>
+
+            <!-- Playback & Timeline Controls -->
+            <div class="playback-bar">
+              <div class="playback-buttons">
+                <button type="button" id="playPauseBtn" class="btn btn-primary" aria-label="Play or pause simulation">
+                  <svg id="playIcon" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  <svg id="pauseIcon" class="hidden" viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                    <path d="M6 5h4v14H6zm8 0h4v14h-4z" />
+                  </svg>
+                  <span id="playPauseLabel" data-i18n="btnPause">Pause</span>
+                </button>
+
+                <button type="button" id="resetBtn" class="btn btn-ghost" title="Reset to preset">
+                  <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                    <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+                    <path d="M3 3v5h5" />
+                  </svg>
+                  <span data-i18n="btnReset">Reset</span>
+                </button>
+
+                <div class="speed-group" role="group" aria-label="Playback speed">
+                  <button type="button" class="speed-btn" data-speed="0.5">0.5×</button>
+                  <button type="button" class="speed-btn active" data-speed="1">1×</button>
+                  <button type="button" class="speed-btn" data-speed="2">2×</button>
+                </div>
+              </div>
+
+              <div class="scrubber-wrap">
+                <div class="scrubber-labels">
+                  <span data-i18n="progressLabel">Eclipse Progress</span>
+                  <span id="progressValue" class="mono">50%</span>
+                </div>
+                <input
+                  type="range"
+                  id="progressSlider"
+                  min="0"
+                  max="100"
+                  step="0.2"
+                  value="50"
+                  aria-label="Eclipse progress timeline"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Observer Sky View + Telemetry + Physics Sliders -->
+        <div class="side-column">
+          <!-- Observer Sky View -->
+          <div class="glass-card sky-card">
+            <div class="card-header">
+              <h2 data-i18n="skyViewTitle">Observer View from Earth</h2>
+              <span id="skyPhaseBadge" class="mini-badge">Totality</span>
+            </div>
+            <div class="canvas-wrapper sky-wrapper">
+              <canvas id="skyCanvas" aria-label="View of the eclipse from Earth's surface"></canvas>
+            </div>
+            <p id="skyCaption" class="sky-caption">
+              At totality, the Moon completely blocks the Sun's bright photosphere, revealing the shimmering solar corona.
+            </p>
+          </div>
+
+          <!-- Live Telemetry -->
+          <div class="glass-card telemetry-card">
+            <div class="card-header">
+              <h2 data-i18n="telemetryTitle">Live Astronomical Telemetry</h2>
+            </div>
+            <div class="telemetry-grid">
+              <div class="stat-box">
+                <span class="stat-label" data-i18n="statObscuration">Obscuration</span>
+                <span id="statObscuration" class="stat-value mono">100.0%</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label" data-i18n="statShadowZone">Shadow Zone</span>
+                <span id="statShadowZone" class="stat-value">Umbra</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label" data-i18n="statApparentSizes">Apparent Size (Moon / Sun)</span>
+                <span id="statApparentSizes" class="stat-value mono">33.6' / 32.0'</span>
+              </div>
+              <div class="stat-box">
+                <span class="stat-label" data-i18n="statAlignment">Alignment Offset</span>
+                <span id="statAlignment" class="stat-value mono">0.00°</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Orbital Controls -->
+          <div class="glass-card controls-card">
+            <div class="card-header">
+              <h2 data-i18n="paramsTitle">Orbital Parameters</h2>
+            </div>
+
+            <div class="control-item">
+              <div class="control-head">
+                <label for="distanceSlider" data-i18n="distLabel">Moon Distance (Perigee ↔ Apogee)</label>
+                <span id="distanceValue" class="mono accent-gold">362,000 km</span>
+              </div>
+              <input
+                type="range"
+                id="distanceSlider"
+                min="356500"
+                max="406700"
+                step="500"
+                value="362000"
+              />
+              <div class="range-hints">
+                <span data-i18n="perigeeHint">356,500 km (Perigee)</span>
+                <span data-i18n="apogeeHint">406,700 km (Apogee)</span>
+              </div>
+            </div>
+
+            <div class="control-item">
+              <div class="control-head">
+                <label for="tiltSlider" data-i18n="tiltLabel">Orbital Tilt Offset (Node Alignment)</label>
+                <div class="tilt-readout">
+                  <span id="tiltValue" class="mono accent-cyan">0.00°</span>
+                  <button type="button" id="snapNodeBtn" class="tiny-btn" data-i18n="snapNode">Align (0°)</button>
+                </div>
+              </div>
+              <input
+                type="range"
+                id="tiltSlider"
+                min="-5.1"
+                max="5.1"
+                step="0.05"
+                value="0"
+              />
+              <div class="range-hints">
+                <span>-5.14°</span>
+                <span data-i18n="nodeHint">0° (Ecliptic Node)</span>
+                <span>+5.14°</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: Eclipse Phases Timeline -->
+    <section id="phases" class="section-block" aria-label="Eclipse contact phases">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow" data-i18n="phasesEyebrow">Step-by-Step Contact Stages</span>
+          <h2 id="phasesHeading">Stages of an Eclipse</h2>
+        </div>
+        <p class="section-sub" data-i18n="phasesDesc">
+          Click any contact stage below to jump the simulator directly to that moment.
+        </p>
+      </div>
+
+      <div id="phaseCards" class="phase-cards-grid">
+        <!-- Populated dynamically by script.js -->
+      </div>
+    </section>
+
+    <!-- Section 3: Shadow Anatomy & Science Guide -->
+    <section id="guide" class="section-block" aria-label="Shadow anatomy and eclipse guide">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow" data-i18n="guideEyebrow">Physics &amp; Geometry</span>
+          <h2 data-i18n="guideTitle">How Shadows Create Eclipses</h2>
+        </div>
+        <p class="section-sub" data-i18n="guideDesc">
+          An extended light source like the Sun casts three distinct shadow regions behind an opaque moon or planet.
+        </p>
+      </div>
+
+      <!-- 3 Shadow Region Cards -->
+      <div class="shadow-cards-grid">
+        <article class="glass-card shadow-card">
+          <div class="shadow-svg-box">
+            <svg viewBox="0 0 180 76" width="100%" height="76" aria-hidden="true">
+              <circle cx="24" cy="38" r="18" fill="#fbbf24" />
+              <polygon points="78,31 155,38 78,45" fill="rgba(15,23,42,0.95)" stroke="#38bdf8" stroke-width="1.2" />
+              <polygon points="78,31 170,12 170,64 78,45" fill="rgba(148,163,184,0.14)" />
+              <circle cx="78" cy="38" r="7" fill="#94a3b8" />
+            </svg>
+          </div>
+          <div class="shadow-tag tag-umbra" data-i18n="umbraTag">Inner Cone</div>
+          <h3 data-i18n="umbraTitle">Umbra (Total Shadow)</h3>
+          <p data-i18n="umbraDesc">
+            The darkest central cone where all direct sunlight is completely blocked. Observers inside the Moon's umbra experience a Total Solar Eclipse; when the Moon enters Earth's umbra, a Total Lunar Eclipse occurs.
+          </p>
+          <button type="button" class="btn-link demo-btn" data-preset="solar-total" data-i18n="demoUmbra">
+            Demo Total Eclipse →
+          </button>
+        </article>
+
+        <article class="glass-card shadow-card">
+          <div class="shadow-svg-box">
+            <svg viewBox="0 0 180 76" width="100%" height="76" aria-hidden="true">
+              <circle cx="24" cy="38" r="18" fill="#fbbf24" />
+              <polygon points="78,31 170,8 170,68 78,45" fill="rgba(148,163,184,0.28)" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 3" />
+              <polygon points="78,31 142,38 78,45" fill="#0b1120" />
+              <circle cx="78" cy="38" r="7" fill="#94a3b8" />
+            </svg>
+          </div>
+          <div class="shadow-tag tag-penumbra" data-i18n="penumbraTag">Outer Cone</div>
+          <h3 data-i18n="penumbraTitle">Penumbra (Partial Shadow)</h3>
+          <p data-i18n="penumbraDesc">
+            The wider outer region where only part of the Sun is obscured. Being inside the penumbra produces a Partial Solar Eclipse or a subtle Penumbral Lunar Eclipse.
+          </p>
+          <button type="button" class="btn-link demo-btn" data-preset="solar-partial" data-i18n="demoPenumbra">
+            Demo Partial Eclipse →
+          </button>
+        </article>
+
+        <article class="glass-card shadow-card">
+          <div class="shadow-svg-box">
+            <svg viewBox="0 0 180 76" width="100%" height="76" aria-hidden="true">
+              <circle cx="24" cy="38" r="18" fill="#fbbf24" />
+              <polygon points="70,31 116,38 70,45" fill="#0b1120" />
+              <polygon points="116,38 172,26 172,50" fill="rgba(245,158,11,0.24)" stroke="#f59e0b" stroke-width="1.2" />
+              <circle cx="70" cy="38" r="7" fill="#94a3b8" />
+            </svg>
+          </div>
+          <div class="shadow-tag tag-antumbra" data-i18n="antumbraTag">Beyond Umbra Tip</div>
+          <h3 data-i18n="antumbraTitle">Antumbra ("Ring of Fire")</h3>
+          <p data-i18n="antumbraDesc">
+            When the Moon is near Apogee (farther from Earth), its umbra ends before reaching Earth's surface. Observers in the diverging antumbra see a bright golden ring around the Moon — an Annular Solar Eclipse.
+          </p>
+          <button type="button" class="btn-link demo-btn" data-preset="solar-annular" data-i18n="demoAntumbra">
+            Demo Annular Eclipse →
+          </button>
+        </article>
+      </div>
+
+      <!-- Comparison & Key Concepts -->
+      <div class="info-split-grid">
+        <div class="glass-card comparison-card">
+          <h3 data-i18n="compareTitle">Solar vs. Lunar Eclipse Comparison</h3>
+          <div class="table-wrap">
+            <table class="compare-table">
+              <thead>
+                <tr>
+                  <th data-i18n="colFeature">Feature</th>
+                  <th class="solar-col" data-i18n="colSolar">Solar Eclipse</th>
+                  <th class="lunar-col" data-i18n="colLunar">Lunar Eclipse</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td data-i18n="rowAlignLabel">Alignment</td>
+                  <td data-i18n="rowAlignSolar">Sun → Moon → Earth</td>
+                  <td data-i18n="rowAlignLunar">Sun → Earth → Moon</td>
+                </tr>
+                <tr>
+                  <td data-i18n="rowPhaseLabel">Moon Phase</td>
+                  <td data-i18n="rowPhaseSolar">New Moon</td>
+                  <td data-i18n="rowPhaseLunar">Full Moon</td>
+                </tr>
+                <tr>
+                  <td data-i18n="rowDurLabel">Totality Duration</td>
+                  <td data-i18n="rowDurSolar">Up to ~7.5 minutes</td>
+                  <td data-i18n="rowDurLunar">Up to ~1 hr 47 min</td>
+                </tr>
+                <tr>
+                  <td data-i18n="rowVisLabel">Where Visible</td>
+                  <td data-i18n="rowVisSolar">Narrow path (~100–270 km wide)</td>
+                  <td data-i18n="rowVisLunar">Entire night side of Earth</td>
+                </tr>
+                <tr>
+                  <td data-i18n="rowSafeLabel">Eye Safety</td>
+                  <td data-i18n="rowSafeSolar">ISO 12312-2 solar glasses required</td>
+                  <td data-i18n="rowSafeLunar">100% safe with naked eyes</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="glass-card facts-card">
+          <h3 data-i18n="factsTitle">Fascinating Eclipse Science</h3>
+          <ul class="fact-list">
+            <li>
+              <strong data-i18n="fact1Title">Why Not Every Month?</strong>
+              <span data-i18n="fact1Body">
+                The Moon's orbit is tilted by <strong>5.14°</strong> to Earth's orbital plane (the ecliptic). Most New and Full Moons pass slightly above or below the shadow cone unless near an orbital node.
+              </span>
+            </li>
+            <li>
+              <strong data-i18n="fact2Title">Why Is a Total Lunar Eclipse Red?</strong>
+              <span data-i18n="fact2Body">
+                Earth's atmosphere scatters short blue wavelengths (Rayleigh scattering) and bends longer red-orange light into the umbra — projecting every sunrise and sunset on Earth onto the Moon!
+              </span>
+            </li>
+            <li>
+              <strong data-i18n="fact3Title">The Cosmic Coincidence (400× Ratio)</strong>
+              <span data-i18n="fact3Body">
+                The Sun is about <strong>400×</strong> wider than the Moon, and also about <strong>400×</strong> farther from Earth — making both appear ~0.5° wide in our sky.
+              </span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 4: Interactive Quiz -->
+    <section id="quiz" class="section-block" aria-label="Eclipse science quiz">
+      <div class="section-header">
+        <div>
+          <span class="eyebrow" data-i18n="quizEyebrow">Interactive Check</span>
+          <h2 data-i18n="quizTitle">Test Your Eclipse Knowledge</h2>
+        </div>
+        <div class="quiz-score-pill">
+          <span data-i18n="quizScoreLabel">Score:</span>
+          <span id="quizScoreDisplay" class="mono">0 / 6</span>
+        </div>
+      </div>
+
+      <div class="glass-card quiz-card">
+        <div class="quiz-progress-track">
+          <div id="quizProgressBar" class="quiz-progress-fill" style="width: 16.6%"></div>
+        </div>
+
+        <div id="quizBody" class="quiz-body">
+          <div class="quiz-meta">
+            <span id="quizCounter" class="mono">Question 1 of 6</span>
+          </div>
+          <h3 id="quizQuestion" class="quiz-question">Loading question...</h3>
+          <div id="quizOptions" class="quiz-options"></div>
+          <div id="quizFeedback" class="quiz-feedback hidden"></div>
+          <div class="quiz-actions">
+            <button type="button" id="quizNextBtn" class="btn btn-primary hidden" data-i18n="quizNext">
+              Next Question →
+            </button>
+          </div>
+        </div>
+
+        <div id="quizSummary" class="quiz-summary hidden">
+          <div class="summary-badge" id="summaryBadge">★</div>
+          <h3 id="summaryTitle">Quiz Complete!</h3>
+          <p id="summaryText" class="summary-text"></p>
+          <button type="button" id="quizRestartBtn" class="btn btn-primary" data-i18n="quizRestart">
+            Retake Quiz
+          </button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p data-i18n="footerText">
+        Eclipse Lab — Built with HTML5 Canvas, CSS3 &amp; Vanilla JavaScript. Shortcuts: Space (Play/Pause), ← / → (Scrub Phase).
+      </p>
+      <p class="footer-note mono">R☉ = 696,340 km • R⊕ = 6,371 km • R☾ = 1,737.4 km • i = 5.14°</p>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
